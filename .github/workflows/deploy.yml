@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'feature/**'
     paths:
       - 'infrastructure/**'
   pull_request:
@@ -15,7 +16,7 @@ on:
   workflow_dispatch: # Allows manual trigger from the UI
     inputs:
       action:
-        description: 'Terraform Action to perform'
+        description: 'Manual Action'
         required: true
         default: 'apply'
         type: choice
@@ -59,16 +60,16 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+          if [[ "${{ github.event.inputs.action }}" == "destroy" ]]; then
             terraform plan -destroy
           else
             terraform plan
           fi
 
       - name: Terraform Execute Action
-        if: github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
         run: |
-          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+          if [[ "${{ github.event.inputs.action }}" == "destroy" ]]; then
             terraform destroy -auto-approve
           else
             terraform apply -auto-approve
