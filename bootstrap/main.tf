@@ -32,3 +32,8 @@ resource "aws_dynamodb_table" "terraform_locks" {
     type = "S"
   }
 }
+
+module "github_oidc" {
+  source    = "./modules/iam"
+  repo_name = "Eugene-Ludwig/vprofile_webapplication_project_complete"
+}
