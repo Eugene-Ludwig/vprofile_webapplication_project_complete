@@ -27,5 +27,5 @@ resource "aws_route" "private_nat_route" {
   route_table_id         = module.vpc.private_route_table_ids[0]
   destination_cidr_block = "0.0.0.0/0"
 
-  network_interface_id = module.fck-nat.network_interface_id
+  network_interface_id = module.fck-nat.eni_id
 }
