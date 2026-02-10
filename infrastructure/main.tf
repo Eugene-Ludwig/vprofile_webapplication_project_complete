@@ -9,6 +9,14 @@ module "vpc" {
   cluster_name       = var.cluster_name
 }
 
+data "aws_route_table" "private" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project_name}-vpc-private"]
+  }
+  depends_on = [module.vpc]
+}
+
 module "fck-nat" {
   source  = "RaJiska/fck-nat/aws"
   version = "1.4.0"
@@ -19,7 +27,9 @@ module "fck-nat" {
   subnet_id = module.vpc.public_subnets[0]
 
   update_route_tables = true
-  route_table_id      = module.vpc.private_route_table_ids[0]
+  route_table_id      = data.aws_route_table.private.id
 
   instance_type = "t4g.nano"
+
+  depends_on = [module.vpc]
 }

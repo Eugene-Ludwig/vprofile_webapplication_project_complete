@@ -18,6 +18,11 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
+  manage_default_route_table = true
+
+  private_route_table_tags = {
+    Name = "${var.project_name}-vpc-private"
+  }
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = "1"
