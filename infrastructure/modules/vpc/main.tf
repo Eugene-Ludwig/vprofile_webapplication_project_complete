@@ -12,8 +12,8 @@ module "vpc" {
   database_subnets = var.database_subnets
 
   create_database_subnet_route_table = true
-  
-  enable_nat_gateway     = false
+
+  enable_nat_gateway = false
 
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -24,7 +24,7 @@ module "vpc" {
   }
 
   private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 

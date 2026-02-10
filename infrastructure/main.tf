@@ -13,13 +13,13 @@ module "fck-nat" {
   source  = "RaJiska/fck-nat/aws"
   version = "1.4.0"
 
-  name      = "${var.project_name}-fck-nat"
-  vpc_id    = module.vpc.vpc_id
-  
-  subnet_id   = module.vpc.public_subnets[0]
-  
-  update_route_tables = true
-  route_table_id     = module.vpc.private_route_table_ids[0]
+  name   = "${var.project_name}-fck-nat"
+  vpc_id = module.vpc.vpc_id
 
-  instance_type = "t4g.nano" 
+  subnet_id = module.vpc.public_subnets[0]
+
+  update_route_tables = true
+  route_table_id      = module.vpc.private_route_table_ids[0]
+
+  instance_type = "t4g.nano"
 }
