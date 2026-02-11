@@ -30,3 +30,13 @@ resource "aws_route" "private_nat_route" {
 
   network_interface_id = module.fck-nat.eni_id
 }
+
+module "eks" {
+  source          = "./modules/eks"
+  cluster_name    = var.cluster_name
+  project_name    = var.project_name
+  vpc_id          = module.vpc.vpc_id
+  private_subnets = module.vpc.private_subnets
+
+  depends_on = [module.vpc, aws_route.private_nat_route]
+}
