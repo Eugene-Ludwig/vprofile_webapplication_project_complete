@@ -30,6 +30,5 @@ variable "database_subnets" {
 
 variable "cluster_name" {
   type    = string
-  default = "vprofile-eks" # This must match what you name the cluster later
+  default = "vprofile-eks"
 }
-

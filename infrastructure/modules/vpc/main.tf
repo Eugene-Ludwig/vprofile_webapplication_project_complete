@@ -13,7 +13,9 @@ module "vpc" {
 
   create_database_subnet_route_table = true
 
-  enable_nat_gateway = false
+  enable_nat_gateway = true
+  single_nat_gateway = true
+  one_nat_gateway_per_az = var.one_nat_gateway_per_az
 
   enable_dns_hostnames = true
   enable_dns_support   = true

@@ -1,13 +1,13 @@
 variable "aws_region" {
   description = "The AWS region where resources will be created"
   type        = string
-  default     = "eu-south-2"
+  default     = "eu-central-1"
 }
 
 variable "state_bucket_name" {
   description = "Name of the S3 bucket for Terraform state"
   type        = string
-  default     = "vprofile-terraform-state-2026"
+  default     = "vprofile-terraform-state-2026-frankfurt"
 }
 
 variable "lock_table_name" {
