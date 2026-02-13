@@ -10,7 +10,7 @@ variable "vpc_cidr" {
 
 variable "availability_zones" {
   type    = list(string)
-  default = ["eu-south-2a", "eu-south-2b"]
+  default = ["eu-central-1a", "eu-central-1b"]
 }
 
 variable "public_subnets" {
