@@ -8,8 +8,8 @@ module "vpc" {
   database_subnets   = var.database_subnets
   cluster_name       = var.cluster_name
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
   one_nat_gateway_per_az = false
 }
 
@@ -44,5 +44,5 @@ module "eks" {
 
   # depends_on = [module.vpc, aws_route.private_nat_route]
 
-  
+
 }
