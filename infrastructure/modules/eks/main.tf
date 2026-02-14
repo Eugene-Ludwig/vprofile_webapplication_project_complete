@@ -18,11 +18,6 @@ module "eks" {
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
   access_entries = {
-    node_access = {
-      principal_arn = module.eks.eks_managed_node_groups["vprofile_nodes"].iam_role_arn
-      type          = "EC2_LINUX"
-    }
-
     ludwig_admin = {
       principal_arn = "arn:aws:iam::730335639573:user/kops_admin"
       policy_associations = {
