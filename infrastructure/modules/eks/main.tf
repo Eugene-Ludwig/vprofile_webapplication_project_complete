@@ -8,10 +8,10 @@
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.0"
+  version = "~> 20.0"
 
-  name               = var.cluster_name
-  kubernetes_version = "1.31"
+  cluster_name               = var.cluster_name
+  cluster_version = "1.31"
 
   vpc_id                   = var.vpc_id
   subnet_ids               = var.private_subnets
@@ -21,13 +21,26 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
+
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    egress_all = {
+      description      = "Node all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      type             = "egress"
+      cidr_blocks      = ["0.0.0.0/0"]
+    }
+  }
   
-  # access_entries = {
-  #   node_access = {
-  #     principal_arn = module.eks.eks_managed_node_groups["vprofile_nodes"].iam_role_arn
-  #     type          = "EC2_LINUX"
-  #   }
-  # }
 
   eks_managed_node_groups = {
     vprofile_nodes = {
@@ -35,21 +48,13 @@ module "eks" {
       max_size     = 3
       desired_size = 2
 
-      pre_bootstrap_user_data = <<-EOT
-      export USE_MAX_PODS=false
-      export AWS_DEFAULT_REGION=eu-central-1
-      export AWS_STS_REGIONAL_ENDPOINTS=regional
-    EOT
+      # iam_role_name = "${var.cluster_name}-node-role"
 
-      # create_iam_role = true
-      # iam_role_name   = "${var.cluster_name}-node-role"
-      # iam_role_additional_policies = {
-      #   AmazonEKSWorkerNodePolicy          = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-      #   AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      #   AmazonEKS_CNI_Policy               = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-      # }
-      
-      iam_role_name = "${var.cluster_name}-node-role"
+      ami_type = "AL2_x86_64"
+
+      pre_bootstrap_user_data = <<-EOT
+        export USE_MAX_PODS=false
+      EOT
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
@@ -61,10 +66,15 @@ module "eks" {
   }
 
 
-  addons = {
-    coredns    = {}
-    kube-proxy = {}
+cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
     vpc-cni = {
+      most_recent = true
       configuration_values = jsonencode({
         env = {
           ENABLE_PREFIX_DELEGATION = "true"
@@ -72,7 +82,6 @@ module "eks" {
         }
       })
     }
-    aws-ebs-csi-driver = {}
   }
 
   tags = {
