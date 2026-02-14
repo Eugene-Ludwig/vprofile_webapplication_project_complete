@@ -1,11 +1,3 @@
-# data "aws_caller_identity" "current" {}
-# data "aws_partition" "current" {}
-
-# locals {
-#   account_id = data.aws_caller_identity.current.account_id
-#   partition  = data.aws_partition.current.partition
-# }
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
@@ -24,6 +16,25 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
+
+  access_entries = {
+    node_access = {
+      principal_arn = module.eks.eks_managed_node_groups["vprofile_nodes"].iam_role_arn
+      type          = "EC2_LINUX"
+    }
+
+    ludwig_admin = {
+      principal_arn = "arn:aws:iam::730335639573:user/kops_admin"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
 
   node_security_group_additional_rules = {
     ingress_self_all = {
