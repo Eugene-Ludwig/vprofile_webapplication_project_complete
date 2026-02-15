@@ -5,7 +5,7 @@ module "eks" {
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
-  cluster_name               = var.cluster_name
+  cluster_name    = var.cluster_name
   cluster_version = "1.31"
 
   vpc_id                   = var.vpc_id
@@ -17,7 +17,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
-  access_entries = {
+  access_entries = var.is_local_run ? {} : {
     ludwig_admin = {
       principal_arn = "arn:aws:iam::730335639573:user/kops_admin"
       policy_associations = {
@@ -41,23 +41,21 @@ module "eks" {
       self        = true
     }
     egress_all = {
-      description      = "Node all egress"
-      protocol         = "-1"
-      from_port        = 0
-      to_port          = 0
-      type             = "egress"
-      cidr_blocks      = ["0.0.0.0/0"]
+      description = "Node all egress"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "egress"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
-  
+
 
   eks_managed_node_groups = {
     vprofile_nodes = {
       min_size     = 1
       max_size     = 3
-      desired_size = 2
-
-      # iam_role_name = "${var.cluster_name}-node-role"
+      desired_size = 1
 
       ami_type = "AL2_x86_64"
 
@@ -68,6 +66,11 @@ module "eks" {
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
 
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled" = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
+      }
+
       labels = {
         role = "worker"
       }
@@ -75,7 +78,7 @@ module "eks" {
   }
 
 
-cluster_addons = {
+  cluster_addons = {
     coredns = {
       most_recent = true
     }

@@ -32,3 +32,8 @@ variable "cluster_name" {
   type    = string
   default = "vprofile-eks"
 }
+
+variable "is_local_run" {
+  type    = bool
+  default = false
+}
