@@ -1,0 +1,6 @@
+# Allow unrestricted egress for package updates and simplified networking
+AVD-AWS-0104
+# Allow default S3 encryption to avoid KMS costs ($1/month)
+AVD-AWS-0132
+# Allow unencrypted EBS root volumes for cost savings
+AVD-AWS-0131
