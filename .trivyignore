@@ -4,3 +4,5 @@ AVD-AWS-0104
 AVD-AWS-0132
 # Allow unencrypted EBS root volumes for cost savings
 AVD-AWS-0131
+# We limited access to specific IPs, so we accept that the endpoint is technically "public"
+AVD-AWS-0040
