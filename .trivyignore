@@ -7,4 +7,4 @@ AVD-AWS-0131
 # We limited access to specific IPs, so we accept that the endpoint is technically "public"
 AVD-AWS-0040
 # Ignore public EKS endpoint for CI/CD compatibility
-AVD-AWS-0038
+AVD-AWS-0041
