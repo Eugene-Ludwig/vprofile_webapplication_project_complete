@@ -17,15 +17,23 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
-  access_entries = var.is_local_run ? {} : {
+  access_entries = {
     ludwig_admin = {
       principal_arn = "arn:aws:iam::730335639573:user/kops_admin"
       policy_associations = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
+          access_scope = { type = "cluster" }
+        }
+      }
+    },
+
+    github_actions = {
+      principal_arn = "arn:aws:iam::730335639573:role/github-actions-eks-role"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = { type = "cluster" }
         }
       }
     }
