@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 module "lb_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
@@ -12,6 +14,6 @@ module "lb_role" {
   }
 
   role_policy_arns = {
-    policy = "arn:aws:iam::730335639573:policy/AWSLoadBalancerControllerIAMPolicy"
+    policy = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/AWSLoadBalancerControllerIAMPolicy"
   }
 }

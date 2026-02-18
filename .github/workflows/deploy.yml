@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'milestone/**'
       - 'dev-**'
     paths:
       - 'infrastructure/**'
@@ -27,21 +28,33 @@ on:
 permissions:
   id-token: write 
   contents: read 
+  security-events: write
 
 jobs:
   terraform:
     name: "Terraform Action"
     runs-on: ubuntu-latest
-    
 
     defaults:
       run:
         working-directory: ./infrastructure
-
+  
     steps:
       
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.' 
+          format: 'table'            
+          exit-code: '1'             
+          severity: 'CRITICAL,HIGH'  
+          scanners: 'misconfig,secret,vuln'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

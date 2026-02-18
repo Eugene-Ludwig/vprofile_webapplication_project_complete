@@ -21,3 +21,8 @@ output "lbc_role_arn" {
   description = "The ARN of the IAM role for the Load Balancer Controller"
   value       = module.eks.lbc_role_arn
 }
+
+output "autoscaler_role_arn" {
+  description = "ARN for the Cluster Autoscaler IAM role"
+  value       = module.autoscaler_role.iam_role_arn
+}

@@ -50,12 +50,34 @@ module "eks" {
     }
   }
 
-
   eks_managed_node_groups = {
-    vprofile_nodes = {
-      min_size     = 1
-      max_size     = 3
-      desired_size = 1
+    system = {
+      name           = "system-nodes"
+      instance_types = ["t3.small"]
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 1
+
+      ami_type = "AL2_x86_64"
+
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled"             = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
+      }
+
+      labels = {
+        "role" = "system"
+      }
+    }
+
+    workload = {
+      name           = "workload-nodes"
+      instance_types = ["t3.medium"]
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 1
 
       ami_type = "AL2_x86_64"
 
@@ -63,17 +85,15 @@ module "eks" {
         export USE_MAX_PODS=false
       EOT
 
-      instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
-
       tags = {
-        "k8s.io/cluster-autoscaler/enabled" = "true"
+        "k8s.io/cluster-autoscaler/enabled"             = "true"
         "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
       }
 
       labels = {
-        role = "worker"
+        "role" = "workload"
       }
+
     }
   }
 
