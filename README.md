@@ -5,25 +5,22 @@ Key Technical Milestones Accomplished:
 
 Infrastructure as Code (IaC): * Developed modular Terraform configurations to provision a custom VPC architecture (Public/Private subnets, NAT Gateways, and IGW).
 
+   Automated EKS Cluster (v1.31) deployment using managed node groups with a Dual-Node-Pool strategy (System pool for management, Workload pool for application traffic).
 
-    Automated EKS Cluster (v1.31) deployment using managed node groups with a Dual-Node-Pool strategy (System pool for management, Workload pool for application traffic).
 
 Security & Identity Management: * Implemented OIDC Federation to bridge GitHub Actions and AWS, enabling keyless authentication.
 
+   Configured IAM Roles for Service Accounts (IRSA) for Kubernetes controllers to follow the Principle of Least Privilege.
+   
 
-    Configured IAM Roles for Service Accounts (IRSA) for Kubernetes controllers to follow the Principle of Least Privilege.
-
-    Managed cluster access through the EKS Access Entry API, configuring identity mapping for local administrators (kops_admin) and CI/CD runners.
-
+Managed cluster access through the EKS Access Entry API, configuring identity mapping for local administrators (kops_admin) and CI/CD runners.
 Cloud-Native Automation & GitOps: * Integrated Helm Provider within Terraform to automatically bootstrap the cluster with essential controllers: AWS Load Balancer Controller and Cluster Autoscaler.
 
-
-    Engineered a GitHub Actions CI/CD Pipeline that performs terraform plan/apply on Pull Requests, ensuring infrastructure changes are validated before merging.
+   Engineered a GitHub Actions CI/CD Pipeline that performs terraform plan/apply on Pull Requests, ensuring infrastructure changes are validated before merging.
 
 Cost & Performance Optimization: * Architected the cluster using AWS Spot Instances to reduce infrastructure costs by ~70%.
 
-
-    Optimized container density by tuning EKS user data (USE_MAX_PODS=false) to bypass default networking limits.
+   Optimized container density by tuning EKS user data (USE_MAX_PODS=false) to bypass default networking limits.
 
 
 Tech Stack: AWS (EKS, VPC, IAM, S3), Terraform, Kubernetes, Helm, GitHub Actions, OIDC, Docker.
