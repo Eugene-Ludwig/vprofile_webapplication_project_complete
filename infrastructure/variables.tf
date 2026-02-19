@@ -1,3 +1,8 @@
+variable "aws_region" {
+  type    = string
+  default = "eu-central-1"
+}
+
 variable "project_name" {
   type    = string
   default = "vprofile"
@@ -31,4 +36,9 @@ variable "database_subnets" {
 variable "cluster_name" {
   type    = string
   default = "vprofile-eks"
+}
+
+variable "is_local_run" {
+  type    = bool
+  default = false
 }
