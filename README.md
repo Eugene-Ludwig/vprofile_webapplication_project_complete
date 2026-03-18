@@ -39,7 +39,7 @@ The goal was to design a reliable and repeatable setup that includes:
 
   * public and private subnets
   * NAT Gateway and Internet Gateway
-* Provisioned an EKS cluster (v1.31):
+* Provisioned an EKS cluster (v1.33):
 
   * multi-AZ setup
   * managed node groups
@@ -132,11 +132,15 @@ GitHub Actions
         ↓
 OIDC → AWS IAM Role
         ↓
-Terraform
+Terraform (provisions AWS infrastructure)
         ↓
 AWS (EKS, VPC, etc.)
         ↓
 Helm → Kubernetes
+        ↓
+Pods (ServiceAccounts)
+        ↓
+IRSA → IAM Roles → AWS APIs
 ```
 
 ---
