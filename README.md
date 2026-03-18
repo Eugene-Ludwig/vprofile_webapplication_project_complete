@@ -1,99 +1,97 @@
-# 🚀 Automated Multi-Tier Cloud-Native Infrastructure (vProfile)
+# Automated Multi-Tier Cloud-Native Infrastructure (vProfile)
 
-## 📌 Overview
+## Overview
 
-This project demonstrates an end-to-end **Everything-as-Code (EaC)** approach to designing, provisioning, and automating a highly available microservices infrastructure on AWS.
+This project focuses on building and automating a production-like cloud infrastructure on AWS using an Everything-as-Code approach.
 
-The platform orchestrates a Java-based application stack (**Tomcat, RabbitMQ, Memcached, MySQL**) on **Amazon EKS**, leveraging Infrastructure-as-Code, Kubernetes, and CI/CD automation.
+The system runs a Java-based application stack (Tomcat, RabbitMQ, Memcached, MySQL) on Amazon EKS, with infrastructure provisioned via Terraform and deployments managed through CI/CD pipelines.
 
 ---
 
-## 🎯 Objective
+## Objective
 
-Design and implement a **production-like cloud-native environment** with:
+The goal was to design a reliable and repeatable setup that includes:
 
-* High availability across multiple availability zones
+* Multi-AZ high availability
 * Fully automated infrastructure provisioning
-* Secure and scalable Kubernetes deployment
+* Secure Kubernetes-based deployment
 * CI/CD-driven infrastructure lifecycle
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
-* **Cloud:** AWS (EKS, VPC, IAM, S3, Route53)
-* **Infrastructure as Code:** Terraform
-* **Container Orchestration:** Kubernetes (EKS)
-* **Package Management:** Helm
-* **CI/CD:** GitHub Actions
-* **Security:** OIDC Federation, IRSA
-* **Containers:** Docker
-
----
-
-## 🏗️ Architecture Highlights
-
-### 🔹 Infrastructure as Code (IaC)
-
-* Designed modular Terraform configurations for a custom VPC:
-
-  * Public & Private subnets
-  * NAT Gateways & Internet Gateway
-* Provisioned **EKS (v1.33)** cluster with:
-
-  * Multi-AZ setup
-  * Managed node groups
-  * Dual-node-pool architecture:
-
-    * **System pool** (cluster services)
-    * **Workload pool** (application traffic)
+* AWS (EKS, VPC, IAM, S3, Route53)
+* Terraform
+* Kubernetes (EKS)
+* Helm
+* GitHub Actions
+* OIDC, IRSA
+* Docker
 
 ---
 
-### 🔐 Security & Identity
+## Architecture
 
-* Implemented **OIDC Federation** between GitHub Actions and AWS (no static credentials)
-* Configured **IAM Roles for Service Accounts (IRSA)** for secure pod-level access
-* Managed cluster access via **EKS Access Entry API**
-* Applied **Principle of Least Privilege** across all components
+### Infrastructure (Terraform)
+
+* Built modular Terraform configuration for a custom VPC:
+
+  * public and private subnets
+  * NAT Gateway and Internet Gateway
+* Provisioned an EKS cluster (v1.31):
+
+  * multi-AZ setup
+  * managed node groups
+  * separate node pools for system and application workloads
 
 ---
 
-### ⚙️ Cloud-Native Automation
+### Security
 
-* Integrated **Helm with Terraform** to bootstrap cluster add-ons:
+* Configured OIDC federation between GitHub Actions and AWS (no static credentials)
+* Implemented IAM Roles for Service Accounts (IRSA) for Kubernetes workloads
+* Managed cluster access via EKS Access Entry API
+* Followed least privilege principles across all components
+
+---
+
+### Kubernetes and Automation
+
+* Used Helm (via Terraform) to install:
 
   * AWS Load Balancer Controller
   * Cluster Autoscaler
-* Configured node labeling & selectors for workload separation
-* Built reusable Infrastructure-as-Code workflows
+* Configured node labels and selectors to separate system and application workloads
+* Built reusable infrastructure workflows
 
 ---
 
-### 💰 Cost & Performance Optimization
+### Cost and Efficiency
 
-* Leveraged **AWS Spot Instances** (~70% cost reduction)
-* Optimized pod density using custom EKS networking settings
-* Designed scalable and efficient resource allocation strategy
-
----
-
-## 🚀 CI/CD Pipeline (GitHub Actions)
-
-Infrastructure provisioning and updates are fully automated using **GitHub Actions** with secure **OIDC-based authentication**.
-
-### 🔧 Pipeline Features
-
-* Triggered on changes in `infrastructure/**`
-* Supports both **automatic** and **manual (apply/destroy)** execution
-* Executes full Terraform lifecycle:
-
-  * `init → fmt → plan → apply/destroy`
-* Uses **OIDC federation** (no AWS keys stored in GitHub)
+* Used AWS Spot Instances to reduce compute costs
+* Tuned EKS networking (prefix delegation, max pods) to increase pod density per node
+* Improved resource utilization across the cluster
 
 ---
 
-### ⚙️ Key Pipeline Logic
+## CI/CD (GitHub Actions)
+
+Infrastructure is deployed and updated through GitHub Actions using OIDC authentication.
+
+### What the pipeline does
+
+* Runs on changes in `infrastructure/**`
+* Supports both automatic runs and manual apply/destroy
+* Executes Terraform workflow:
+
+  * init
+  * plan
+  * apply / destroy
+
+---
+
+### Example workflow
 
 ```yaml
 jobs:
@@ -104,83 +102,78 @@ jobs:
         working-directory: ./infrastructure
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials (OIDC)
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-central-1
 
-      - name: Terraform Init
+      - name: Terraform init
         run: terraform init
 
-      - name: Terraform Plan
+      - name: Terraform plan
         run: terraform plan
 
-      - name: Terraform Apply
+      - name: Terraform apply
         run: terraform apply -auto-approve
 ```
 
 ---
 
-### 🧠 CI/CD Architecture Flow
+### Flow
 
 ```
-Developer Push / PR
+Push / Pull Request
         ↓
-GitHub Actions (CI/CD)
+GitHub Actions
         ↓
-OIDC Authentication → AWS IAM Role
+OIDC → AWS IAM Role
         ↓
-Terraform (IaC)
+Terraform
         ↓
-AWS Infrastructure (EKS, VPC, etc.)
+AWS (EKS, VPC, etc.)
         ↓
-Helm → Kubernetes Add-ons & Workloads
+Helm → Kubernetes
 ```
 
 ---
 
-### 🔐 Security Approach
+## Architecture Diagrams
 
-* Keyless authentication using **OIDC federation**
-* Fine-grained access via **IRSA roles**
-* No long-lived credentials stored in CI/CD
-
----
-
-## 📊 Architecture Diagrams
-
-### 🌐 General VPC Structure
+### VPC structure
 
 <img width="1635" height="1357" src="https://github.com/user-attachments/assets/af142585-31ce-4256-9069-bdd61b965805" />
 
 ---
 
-### ☸️ EKS Cluster Architecture
+### EKS cluster
 
 <img width="813" height="591" src="https://github.com/user-attachments/assets/33a5123c-52ae-4f88-a4af-d2ad704076e1" />
 
 ---
 
-### 🔄 CI Pipeline
+### CI pipeline
 
 <img width="2093" height="978" src="https://github.com/user-attachments/assets/4cbc04da-d100-44a3-a71b-ec4b5d2c9bb7" />
 
 ---
 
-### 🚀 CD Pipeline
+### CD pipeline
 
 <img width="1770" height="1441" src="https://github.com/user-attachments/assets/60fb2d30-6b16-451c-8385-d418fca33783" />
 
 ---
 
-## 📈 Key Takeaways
+## Notes
 
-* Built a **fully automated cloud-native platform** using modern DevOps practices
-* Implemented secure, scalable, and production-like infrastructure
-* Demonstrated hands-on experience with **AWS, Kubernetes, Terraform, and CI/CD**
+This project was built to practice real-world DevOps workflows:
 
----
+* infrastructure as code
+* Kubernetes operations
+* CI/CD automation
+* secure cloud access patterns
+
+It reflects how a small production environment could be structured and managed.
