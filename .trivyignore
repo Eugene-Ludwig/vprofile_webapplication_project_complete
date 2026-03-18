@@ -1,0 +1,10 @@
+# Allow unrestricted egress for package updates and simplified networking
+AVD-AWS-0104
+# Allow default S3 encryption to avoid KMS costs ($1/month)
+AVD-AWS-0132
+# Allow unencrypted EBS root volumes for cost savings
+AVD-AWS-0131
+# We limited access to specific IPs, so we accept that the endpoint is technically "public"
+AVD-AWS-0040
+# Ignore public EKS endpoint for CI/CD compatibility
+AVD-AWS-0041

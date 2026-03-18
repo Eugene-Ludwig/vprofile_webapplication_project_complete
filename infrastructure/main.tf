@@ -14,26 +14,28 @@ module "vpc" {
 }
 
 
-# module "fck-nat" {
-#   source  = "RaJiska/fck-nat/aws"
-#   version = "1.4.0"
+module "fck-nat" {
+  source  = "RaJiska/fck-nat/aws"
+  version = "1.3.0"
 
-#   name   = "${var.project_name}-fck-nat"
-#   vpc_id = module.vpc.vpc_id
+  name   = "${var.project_name}-fck-nat"
+  vpc_id = module.vpc.vpc_id
 
-#   subnet_id = module.vpc.public_subnets[0]
+  subnet_id = module.vpc.public_subnets[0]
 
-#   update_route_tables = false
-#   instance_type       = "t4g.nano"
-# }
+  update_route_tables = false
+  instance_type       = "t4g.nano"
+  ha_mode             = false
 
-# resource "aws_route" "private_nat_route" {
-#   count                  = length(module.vpc.private_route_table_ids)
-#   route_table_id         = module.vpc.private_route_table_ids[count.index]
-#   destination_cidr_block = "0.0.0.0/0"
+}
 
-#   network_interface_id = module.fck-nat.eni_id
-# }
+resource "aws_route" "private_nat_route" {
+  for_each               = { for idx, id in module.vpc.private_route_table_ids : idx => id }
+  route_table_id         = each.value
+  destination_cidr_block = "0.0.0.0/0"
+
+  network_interface_id = module.fck-nat.eni_id
+}
 
 module "eks" {
   source          = "./modules/eks"
@@ -41,8 +43,7 @@ module "eks" {
   project_name    = var.project_name
   vpc_id          = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
+  is_local_run    = var.is_local_run
 
-  # depends_on = [module.vpc, aws_route.private_nat_route]
-
-
+  depends_on = [module.vpc, aws_route.private_nat_route]
 }

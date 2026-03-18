@@ -5,7 +5,7 @@ module "eks" {
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
-  cluster_name               = var.cluster_name
+  cluster_name    = var.cluster_name
   cluster_version = "1.31"
 
   vpc_id                   = var.vpc_id
@@ -23,9 +23,17 @@ module "eks" {
       policy_associations = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
+          access_scope = { type = "cluster" }
+        }
+      }
+    },
+
+    github_actions = {
+      principal_arn = "arn:aws:iam::730335639573:role/github-actions-eks-role"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = { type = "cluster" }
         }
       }
     }
@@ -41,23 +49,43 @@ module "eks" {
       self        = true
     }
     egress_all = {
-      description      = "Node all egress"
-      protocol         = "-1"
-      from_port        = 0
-      to_port          = 0
-      type             = "egress"
-      cidr_blocks      = ["0.0.0.0/0"]
+      description = "Node all egress"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "egress"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
-  
 
   eks_managed_node_groups = {
-    vprofile_nodes = {
-      min_size     = 1
-      max_size     = 3
-      desired_size = 2
+    system = {
+      name           = "system-nodes"
+      instance_types = ["t3.small"]
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 1
 
-      # iam_role_name = "${var.cluster_name}-node-role"
+      ami_type = "AL2_x86_64"
+
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled"             = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
+      }
+
+      labels = {
+        "role" = "system"
+      }
+    }
+
+    workload = {
+      name           = "workload-nodes"
+      instance_types = ["t3.medium"]
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 1
 
       ami_type = "AL2_x86_64"
 
@@ -65,17 +93,20 @@ module "eks" {
         export USE_MAX_PODS=false
       EOT
 
-      instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled"             = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
+      }
 
       labels = {
-        role = "worker"
+        "role" = "workload"
       }
+
     }
   }
 
 
-cluster_addons = {
+  cluster_addons = {
     coredns = {
       most_recent = true
     }

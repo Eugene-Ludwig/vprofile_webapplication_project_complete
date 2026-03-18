@@ -39,6 +39,6 @@ variable "single_nat_gateway" {
 }
 
 variable "one_nat_gateway_per_az" {
-  type        = bool
-  default     = false
+  type    = bool
+  default = false
 }
